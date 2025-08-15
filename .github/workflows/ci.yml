@@ -107,17 +107,16 @@ jobs:
         cd build
         ctest
 
-    - name: Set up Android artifacts
-      if: ${{ contains(matrix.config.name, 'Android') }}
+    - name: Set up artifacts
       shell: bash
       run: |
         cd build
         mkdir archive
-        cp ${{github.workspace}}/build/libopenal.so archive/
+        cp ${{github.workspace}}/build/libopenal*.so archive/ || true
+        cp ${{github.workspace}}/build/Release-iphoneos/libopenal*.dylib archive/ || true
 
     - name: Upload build as a workflow artifact
       uses: actions/upload-artifact@v4
-      if: ${{ contains(matrix.config.name, 'Win') || contains(matrix.config.name, 'Android') }}
       with:
         name: soft_oal-${{matrix.config.name}}
         path: build/archive
@@ -139,6 +138,7 @@ jobs:
     - name: Set up build folders
       run: |
         mkdir -p build/release/OpenALSoft/Documentation
+        mkdir -p build/release/OpenALSoft/libs
         echo "${{github.repository}}" >>                                                                              "build/release/OpenALSoft/Documentation/Version.txt"
         echo "v${{needs.build.outputs.CommitTag}}-${{needs.build.outputs.CommitHashShort}} ${{github.ref_name}}" >>   "build/release/OpenALSoft/Documentation/Version.txt"
         echo "Commit #${{needs.build.outputs.CommitCount}}" >>                                                        "build/release/OpenALSoft/Documentation/Version.txt"
@@ -148,6 +148,8 @@ jobs:
         curl https://raw.githubusercontent.com/${{github.repository}}/${{github.ref_name}}/COPYING                 -o "build/release/OpenALSoft/Documentation/License.txt"
         curl https://raw.githubusercontent.com/${{github.repository}}/${{github.ref_name}}/BSD-3Clause             -o "build/release/OpenALSoft/Documentation/License_BSD-3Clause.txt"
         curl https://raw.githubusercontent.com/${{github.repository}}/${{github.ref_name}}/LICENSE-pffft           -o "build/release/OpenALSoft/Documentation/License_PFFFT.txt"
+        cp ${{github.workspace}}/build/libopenal*.{so,dylib}                                                          "build/release/OpenALSoft/libs" || true
+        cp ${{github.workspace}}/build/Release-iphoneos/libopenal*.dylib                                              "build/release/OpenALSoft/libs" || true
         cp -r "build/release/OpenALSoft"                                                                              "build/release/OpenALSoft+HRTF"
 
     - name: Compress artifacts
