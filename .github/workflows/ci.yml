@@ -135,6 +135,36 @@ jobs:
       contents: write
     steps:
 
+    - name: Get artifacts Android_arm64-v8a-Release
+      uses: actions/download-artifact@v4
+      with:
+        name: soft_oal-Android_arm64-v8a-Release
+        path: build/release/OpenALSoft/libs/arm64-v8a
+
+    - name: Get artifacts Android_armeabi-v7a-Release
+      uses: actions/download-artifact@v4
+      with:
+        name: soft_oal-Android_armeabi-v7a-Release
+        path: build/release/OpenALSoft/libs/armeabi-v7a
+
+    - name: Get artifacts Android_x86_64-Release
+      uses: actions/download-artifact@v4
+      with:
+        name: soft_oal-Android_x86_64-Release
+        path: build/release/OpenALSoft/libs/x86_64
+
+    - name: Get artifacts Android_x86-Release
+      uses: actions/download-artifact@v4
+      with:
+        name: soft_oal-Android_x86-Release
+        path: build/release/OpenALSoft/libs/x86
+
+    - name: Get artifacts iOS-Release
+      uses: actions/download-artifact@v4
+      with:
+        name: soft_oal-iOS-Release
+        path: build/release/OpenALSoft/libs/iOS
+
     - name: Set up build folders
       run: |
         mkdir -p build/release/OpenALSoft/Documentation
@@ -148,15 +178,11 @@ jobs:
         curl https://raw.githubusercontent.com/${{github.repository}}/${{github.ref_name}}/COPYING                 -o "build/release/OpenALSoft/Documentation/License.txt"
         curl https://raw.githubusercontent.com/${{github.repository}}/${{github.ref_name}}/BSD-3Clause             -o "build/release/OpenALSoft/Documentation/License_BSD-3Clause.txt"
         curl https://raw.githubusercontent.com/${{github.repository}}/${{github.ref_name}}/LICENSE-pffft           -o "build/release/OpenALSoft/Documentation/License_PFFFT.txt"
-        cp ${{github.workspace}}/build/libopenal*.{so,dylib}                                                          "build/release/OpenALSoft/libs" || true
-        cp ${{github.workspace}}/build/Release-iphoneos/libopenal*.dylib                                              "build/release/OpenALSoft/libs" || true
-        cp -r "build/release/OpenALSoft"                                                                              "build/release/OpenALSoft+HRTF"
 
     - name: Compress artifacts
       run: |
         cd build/release
         7z a OpenALSoft.zip      ./OpenALSoft/*
-        7z a OpenALSoft+HRTF.zip ./OpenALSoft+HRTF/*
 
     - name: GitHub pre-release
       uses: "Sweeistaken/sweelease@v1.1"
